@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /root/cWAF-client/inc/bash_colors.sh
+source /root/cwaf-client/inc/bash_colors.sh
 
 echo "+"
 echo -n "+ (::) "; clr_blackb "SEC" -n; clr_blueb "THEM" -n; clr_blackb "ALL"

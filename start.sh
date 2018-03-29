@@ -1,12 +1,12 @@
 #!/bin/bash
 
-source /root/cWAF-client/inc/bash_colors.sh
+source /root/cwaf-client/inc/bash_colors.sh
 
 echo "+"
 echo -n "+ (::) "; clr_blackb "SEC" -n; clr_blueb "THEM" -n; clr_blackb "ALL"
 echo "+"
 
-if [ ! -f /root/cWAF-client/client/config.json ]; then
+if [ ! -f /root/cwaf-client/client/config.json ]; then
 	labeler; echo " Please, run setup first: setup"
 	exit 1
 fi
@@ -25,7 +25,7 @@ fi
 
 # start stub status
 labelin; echo " Starting secthemall-status client..."
-/usr/bin/python /root/cWAF-client/client/send_stub_status.py > /dev/null 2>&1 &
+/usr/bin/python /root/cwaf-client/client/send_stub_status.py > /dev/null 2>&1 &
 CHKPS=$(ps aux | grep 'send_stub_status' | grep -v grep | wc -l)
 if [ $CHKPS -gt 0 ]; then
 	labelok; echo " Command sent, secthemall-status client is running."
@@ -36,7 +36,7 @@ fi
 
 # start updates
 labelin; echo " Starting secthemall-updates client..."
-/usr/bin/python /root/cWAF-client/client/updates.py > /dev/null 2>&1 &
+/usr/bin/python /root/cwaf-client/client/updates.py > /dev/null 2>&1 &
 CHKPS=$(ps aux | grep 'updates' | grep -v grep | wc -l)
 if [ $CHKPS -gt 0 ]; then
 	labelok; echo " Command sent, secthemall-updates client is running."
@@ -47,7 +47,7 @@ fi
 
 # start updates
 labelin; echo " Starting secthemall-sendlog client..."
-/usr/bin/python /root/cWAF-client/client/sendlogs.py > /dev/null 2>&1 &
+/usr/bin/python /root/cwaf-client/client/sendlogs.py > /dev/null 2>&1 &
 CHKPS=$(ps aux | grep 'sendlogs' | grep -v grep | wc -l)
 if [ $CHKPS -gt 0 ]; then
 	labelok; echo " Command sent, secthemall-sendlogs client is running."

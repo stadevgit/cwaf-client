@@ -5,13 +5,13 @@ import os, json, time, requests, re, urllib, netaddr
 hostname = os.popen('hostname').read().strip()
 
 try:
-	with open('/root/cWAF-client/client/config.json') as data_file:    
+	with open('/root/cwaf-client/client/config.json') as data_file:    
 		config = json.load(data_file)
 except:
 	print "+ Config file not found, creating it..."
 	config = {}
 else:
-	with open('/root/cWAF-client/client/config.json') as data_file:    
+	with open('/root/cwaf-client/client/config.json') as data_file:    
 		config = json.load(data_file)
 
 class bcolor:
@@ -96,7 +96,7 @@ def getip(mslog):
 
 
 	realip = mslog['transaction']['client_ip']
-	with open('/root/cWAF-client/client/inc/cf-'+ipv+'.txt', 'r') as fp:
+	with open('/root/cwaf-client/client/inc/cf-'+ipv+'.txt', 'r') as fp:
 		for cfcidr in fp:
 			if netaddr.IPAddress(realip) in netaddr.IPNetwork(cfcidr.strip()):
 				realip = mslog['transaction']['request']['headers']['cf-connecting-ip']

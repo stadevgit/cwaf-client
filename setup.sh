@@ -1,12 +1,12 @@
 #!/bin/bash
 
-source /root/cWAF-client/inc/bash_colors.sh
+source /root/cwaf-client/inc/bash_colors.sh
 
 echo "+"
 echo -n "+ (::) "; clr_blackb "SEC" -n; clr_blueb "THEM" -n; clr_blackb "ALL"
 echo "+"
 
-if [ -f /root/cWAF-client/client/config.json ]; then
+if [ -f /root/cwaf-client/client/config.json ]; then
 	labelwa; echo -n " Configuration already exists. Do you want to overwrite it? [y/N]: "
 	read ans
 
@@ -22,9 +22,9 @@ if [ -f /root/cWAF-client/client/config.json ]; then
 		fi
 	fi
 else
-	touch /root/cWAF-client/client/config.json
-	mkdir /root/cWAF-client/client/ids
-	touch /root/cWAF-client/client/ids/lastid_config
+	touch /root/cwaf-client/client/config.json
+	mkdir /root/cwaf-client/client/ids
+	touch /root/cwaf-client/client/ids/lastid_config
 fi
 
 dpkg-reconfigure tzdata 2>/dev/null
@@ -50,7 +50,7 @@ if [[ "${USERID:0:2}" == "ok" ]]; then
 fi
 
 echo ""
-python /root/cWAF-client/client/updates.py "${USERNAME}" "${APIKEY}"
+python /root/cwaf-client/client/updates.py "${USERNAME}" "${APIKEY}"
 
 # se non esiste
 #if [ ! -f /root/ssl/dhparam.pem ]; then

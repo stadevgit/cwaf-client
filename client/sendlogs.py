@@ -11,7 +11,7 @@ basedir = '/usr/local/openresty/nginx/logs/modsecurity'
 hostip = os.popen("hostname -i").read().strip()
 
 while True:
-	c = json.load(open('/root/cWAF-client/client/config.json'))
+	c = json.load(open('/root/cwaf-client/client/config.json'))
 
 	for root, subFolders, files in os.walk(basedir):
 		for dir in subFolders:

@@ -10,7 +10,7 @@ cpath = os.path.dirname(os.path.abspath(__file__))
 while True:
 	cfile = cpath+'/configurations.json'
 	lastidfile = cpath+'/ids/lastid_config'
-	c = json.load(open('/root/cWAF-client/client/config.json'))
+	c = json.load(open('/root/cwaf-client/client/config.json'))
 
 	log = {
 		'hostname': base64.encodestring(hostname),

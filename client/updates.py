@@ -22,7 +22,7 @@ def startUpdate():
 		os.popen('find /usr/local/openresty/nginx/logs/modsecurity/http*/* -type d -empty -exec rm -rvf {} \; 2>/dev/null')
 
 		# load json config file
-		c = json.load(open('/root/cWAF-client/client/config.json'))
+		c = json.load(open('/root/cwaf-client/client/config.json'))
 
 		r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getupdates', 'hostname':hostname})
 		res = json.loads(r.text)
@@ -183,7 +183,7 @@ else:
 				"usertz":res['usertz']
 			}
 
-			with open('/root/cWAF-client/client/config.json', 'w') as f:
+			with open('/root/cwaf-client/client/config.json', 'w') as f:
 				json.dump(config, f)
 
 			sta.log('OK', "Creating / Checking node "+hostname+"...")
