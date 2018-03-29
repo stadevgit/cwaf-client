@@ -1,0 +1,17 @@
+SecRule REQUEST_FILENAME "!@rx \.(%{REPLACE:FileExt})$" "id:6000,\
+	t:none,t:urlDecodeUni,t:lowercase,\
+	msg:'File extension not allowed',\
+	severity:'CRITICAL',\
+	phase:request,\
+	ver:'SECTHEMALL_Custom_Rules',\
+	maturity:'9',\
+	accuracy:'9',\
+	rev:'1',\
+	log,\
+	deny,\
+	chain"
+SecRule REQUEST_FILENAME "@rx ^\/.+\.[^\/]+$" "phase:request,id:6000,\
+   t:none,t:urlDecodeUni,t:lowercase,\
+   tag:'custom-rules',\
+   tag:'file-extension-not-allowed',\
+   logdata:'Matched Data: %{TX.0} found within %{MATCHED_VAR_NAME}: %{MATCHED_VAR}'"

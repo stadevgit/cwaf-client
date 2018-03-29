@@ -1,0 +1,94 @@
+SecRuleEngine On
+SecRequestBodyAccess On
+
+SecRule REQUEST_HEADERS:Content-Type "(?:text|application)/xml" \
+     "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+
+SecRule REQUEST_HEADERS:Content-Type "application/json" \
+     "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+
+#SecRequestBodyLimit 13107200
+#SecRequestBodyLimit 100000000
+#SecRequestBodyNoFilesLimit 131072
+
+#SecRequestBodyInMemoryLimit 131072
+#SecRequestBodyLimitAction Reject
+
+SecRule REQBODY_ERROR "!@eq 0" \
+"id:'200002', phase:2,t:none,log,deny,status:403,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+
+SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
+"id:'200003',phase:2,t:none,log,deny,status:403, \
+msg:'Multipart request body failed strict validation: \
+PE %{REQBODY_PROCESSOR_ERROR}, \
+BQ %{MULTIPART_BOUNDARY_QUOTED}, \
+BW %{MULTIPART_BOUNDARY_WHITESPACE}, \
+DB %{MULTIPART_DATA_BEFORE}, \
+DA %{MULTIPART_DATA_AFTER}, \
+HF %{MULTIPART_HEADER_FOLDING}, \
+LF %{MULTIPART_LF_LINE}, \
+SM %{MULTIPART_MISSING_SEMICOLON}, \
+IQ %{MULTIPART_INVALID_QUOTING}, \
+IP %{MULTIPART_INVALID_PART}, \
+IH %{MULTIPART_INVALID_HEADER_FOLDING}, \
+FL %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
+
+SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
+"id:'200004',phase:2,t:none,log,deny,msg:'Multipart parser detected a possible unmatched boundary.'"
+
+SecPcreMatchLimit 150000
+SecPcreMatchLimitRecursion 150000
+
+SecRule TX:/^MSC_/ "!@streq 0" \
+        "id:'200005',phase:2,t:none,deny,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
+
+SecResponseBodyAccess On
+SecResponseBodyMimeType text/plain text/html text/xml
+SecResponseBodyLimit 524288
+SecResponseBodyLimitAction ProcessPartial
+
+SecTmpDir /tmp/
+SecDataDir /tmp/
+
+SecAuditEngine On
+SecAuditLogRelevantStatus "^[0-9]+"
+SecAuditLogParts ABCIJDEFHZ
+SecAuditLogType concurrent
+SecAuditLogFormat JSON
+SecAuditLogStorageDir /usr/local/openresty/nginx/logs/modsecurity/%{REPLACE:CONFNAME}
+
+SecArgumentSeparator &
+SecCookieFormat 0
+SecUnicodeMapFile unicode.mapping 20127
+SecStatusEngine Off
+
+
+# ----- CUSTOM CONFIG ----- #
+
+
+
+# setup
+Include /usr/local/openresty/nginx/conf/owasp-modsecurity-crs/crs-setup.conf
+
+# override
+Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.override
+Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.override.by.user
+
+# bad reputation
+SecRule REMOTE_ADDR "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:1,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+SecRule REMOTE_ADDR "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_tor_exit_nodes.txt" "id:2,msg:'TOR exit node',tag:'bad-reputation/TOR-exit-node',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+
+# bad reputation cloudflare
+SecRule REQUEST_HEADERS:CF-Connecting-IP "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:3,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+
+# bad reputation x-forwarded-for
+SecRule REQUEST_HEADERS:X-Forwarded-For "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:4,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+
+# owasp core ruleset
+Include /usr/local/openresty/nginx/conf/owasp-modsecurity-crs/rules/*.conf
+
+# stawaf custom rules
+Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.custom.*
+
+# ignore rules
+Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.ignore
