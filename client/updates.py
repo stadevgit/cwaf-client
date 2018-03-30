@@ -188,7 +188,7 @@ else:
 
 			sta.log('OK', "Creating / Checking node "+hostname+"...")
 			r = requests.post('https://secthemall.com/api/waf', data={"username":email, "apikey":apikey, "a":"new", "hostname":hostname})
-			#print r.text
+			# print r.text
 
 			resjson = json.loads(r.text)
 			try:

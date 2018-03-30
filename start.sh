@@ -46,15 +46,15 @@ else
 fi
 
 # start updates
-labelin; echo " Starting secthemall-sendlog client..."
-/usr/bin/python /root/cwaf-client/client/sendlogs.py > /dev/null 2>&1 &
-CHKPS=$(ps aux | grep 'sendlogs' | grep -v grep | wc -l)
-if [ $CHKPS -gt 0 ]; then
-	labelok; echo " Command sent, secthemall-sendlogs client is running."
-else
-	labeler; echo " Process not found, secthemall-sendlogs client is not running."
-	exit 1
-fi
+#labelin; echo " Starting secthemall-sendlog client..."
+#/usr/bin/python /root/cwaf-client/client/sendlogs.py > /dev/null 2>&1 &
+#CHKPS=$(ps aux | grep 'sendlogs' | grep -v grep | wc -l)
+#if [ $CHKPS -gt 0 ]; then
+#	labelok; echo " Command sent, secthemall-sendlogs client is running."
+#else
+#	labeler; echo " Process not found, secthemall-sendlogs client is not running."
+#	exit 1
+#fi
 
 labelok; echo " Done."
 echo ""

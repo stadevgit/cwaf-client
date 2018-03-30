@@ -42,6 +42,8 @@ read USERNAME
 echo -en "+ Password: "
 read -s PASSWORD
 
+SERVERALIAS=$(hostname)
+
 ENCODEDPASSWD=$(echo ${PASSWORD} | sed -e 's/"/\"/g' |sed -e 's/&/%26/g')
 USERID=$(curl -s -d "a=auth&username=${USERNAME}&password=${ENCODEDPASSWD}&alias=${SERVERALIAS}" 'https://secthemall.com/auth/')
 

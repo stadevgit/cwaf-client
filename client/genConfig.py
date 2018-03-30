@@ -7,7 +7,7 @@ cpath = os.path.dirname(os.path.abspath(__file__))
 cfile = cpath+'/configurations.json'
 c = json.load(open(cfile, 'r'))
 
-#print(c['conf'])
+print(c['conf'])
 for cname, carr in c['conf'].items():
 	if carr['listen'].has_key('http'):
 		if carr.has_key('fwd_uri'):
@@ -28,8 +28,12 @@ for cname, carr in c['conf'].items():
 			configout += "\tserver_name "+servernames+";\n\n"
 
 		bodyfiltersflags = 'c'
-		if carr.has_key('respbody') and carr['respbody'].has_key('email') and carr['respbody']['email'] == 1:
-			bodyfiltersflags += 'M'
+
+		try:
+			if carr.has_key('respbody') and carr['respbody'].has_key('email') and carr['respbody']['email'] == 1:
+				bodyfiltersflags += 'M'
+		except:
+			print 'no respbody'
 
 		configout += "\tset $tmwBodyFunc \""+bodyfiltersflags+"\";\n\n"
 
