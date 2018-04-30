@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import requests, re, os, sys, json, time, base64
+import requests, re, os, sys, json, time, base64, urllib
 import stapkg.functions as sta
 
-hostip = os.popen("hostname -i").read().strip()
-hostname = os.popen('hostname').read().strip()
+hostip = os.popen("hostname -i").read().rstrip()
+hostname = os.popen('hostname').read().rstrip()
 cpath = os.path.dirname(os.path.abspath(__file__))
 
 while True:
@@ -13,8 +13,8 @@ while True:
 	c = json.load(open('/root/cwaf-client/client/config.json'))
 
 	log = {
-		'hostname': base64.encodestring(hostname),
-		'ip': base64.encodestring(hostip),
+		'hostname': base64.encodestring(hostname).rstrip(),
+		'ip': base64.encodestring(hostip).rstrip(),
 		'unixtsms': int(round(time.time() * 1000))
 	}
 
@@ -36,9 +36,8 @@ while True:
 			log['writing'] = int(rww.group(2))
 			log['waiting'] = int(rww.group(3))
 
-
-	enclogs = sta.encrypt(str(json.dumps(log)))
-	r = requests.post('https://wl.secthemall.com/api_waf.php', data = {'a':'writelog', 'type':'stub_status', 'username':c['username'], 'tz':c['usertz'], 'apikey':c['apikey'], 'logs':enclogs})
+	enclogs = urllib.quote_plus(sta.encrypt(str(json.dumps(log))))
+	r = requests.post('https://wl.secthemall.com/api/waf', data = {'a':'writelog', 'type':'stub_status', 'username':c['username'], 'tz':c['usertz'], 'apikey':c['apikey'], 'logs':enclogs})
 
 	if r.text:
 		sta.log('OK', 'statistic logs sent to console')

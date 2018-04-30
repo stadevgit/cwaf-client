@@ -49,10 +49,13 @@ USERID=$(curl -s -d "a=auth&username=${USERNAME}&password=${ENCODEDPASSWD}&alias
 
 if [[ "${USERID:0:2}" == "ok" ]]; then
 	APIKEY=${USERID:74}
-fi
 
-echo ""
-python /root/cwaf-client/client/updates.py "${USERNAME}" "${APIKEY}"
+	echo ""
+	python /root/cwaf-client/client/updates.py "${USERNAME}" "${APIKEY}"
+
+	labelok; echo " Done."
+	labelok; echo " Now you can start this container."
+fi
 
 # se non esiste
 #if [ ! -f /root/ssl/dhparam.pem ]; then
@@ -60,6 +63,4 @@ python /root/cwaf-client/client/updates.py "${USERNAME}" "${APIKEY}"
 #	openssl dhparam -out /root/ssl/dhparam.pem 4096
 #fi
 
-labelok; echo " Done."
-labelok; echo " Now, type: start"
-exit 0
+

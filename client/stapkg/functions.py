@@ -42,7 +42,7 @@ def encrypt(string):
 	with open(randfile, "w") as f:
 		f.write(string)
 
-	encstring = os.popen("cat "+randfile+" | openssl enc -aes-128-cbc -base64 -A -salt -pass pass:"+config['passphrase']).read()
+	encstring = os.popen("cat "+randfile+" | openssl enc -aes-128-cbc -base64 -md md5 -A -salt -pass pass:"+config['passphrase']).read()
 	os.unlink(randfile)
 	return encstring
 
