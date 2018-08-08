@@ -24,7 +24,6 @@ def startUpdate():
 	c = json.load(open('/root/cwaf-client/client/config.json'))
 
 	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getupdates', 'hostname':hostname.rstrip()})
-	print r
 	res = json.loads(r.text)
 	# finire getupdates (serve per reload conf nginx)
 	if res.has_key('ok'):
@@ -146,14 +145,15 @@ def startUpdate():
 
 
 	# check Nginx status
-	sta.log('INFO', 'Check Nginx configuration syntax...')
-	if sta.nginx('check'):
-		sta.log('ERROR', 'Nginx syntax error, pushed to console')
-	else:
-		sta.log('OK', 'No errors found in Nginx config file')
+	if downloadconf or downloadbl or downloadtor:
+		sta.log('INFO', 'Check Nginx configuration syntax...')
+		if sta.nginx('check'):
+			sta.log('ERROR', 'Nginx syntax error, pushed to console')
+		else:
+			sta.log('OK', 'No errors found in Nginx config file')
 
-		if downloadtor or downloadbl or downloadconf:
-			sta.nginx('reload')
+			if downloadtor or downloadbl or downloadconf:
+				sta.nginx('reload')
 
 
 
@@ -165,7 +165,7 @@ try:
 except:
 	while True:
 		startUpdate()
-		time.sleep(60)
+		time.sleep(10)
 else:
 	if re.search('^\S+\@[a-zA-Z0-9\-\_\.]+$', sys.argv[1]) is not None and re.search('^[a-z0-9]+$', sys.argv[2]) is not None:
 		email = sys.argv[1]

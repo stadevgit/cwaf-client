@@ -39,7 +39,10 @@ while True:
 	enclogs = urllib.quote_plus(sta.encrypt(str(json.dumps(log))))
 	r = requests.post('https://wl.secthemall.com/api/waf', data = {'a':'writelog', 'type':'stub_status', 'username':c['username'], 'tz':c['usertz'], 'apikey':c['apikey'], 'logs':enclogs})
 
+	print r
+
 	if r.text:
+		print r.text
 		sta.log('OK', 'statistic logs sent to console')
 
 	sta.log('INFO', 'sleep 10 minutes')

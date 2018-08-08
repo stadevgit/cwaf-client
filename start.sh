@@ -14,7 +14,7 @@ fi
 
 # start stub status
 labelin; echo " Starting secthemall-status client..."
-sleep 10 && /usr/bin/python /root/cwaf-client/client/send_stub_status.py > /dev/null 2>&1 &
+sleep 10 && /usr/bin/python /root/cwaf-client/client/send_stub_status.py &
 #CHKPS=$(ps aux | grep 'send_stub_status' | grep -v grep | wc -l)
 #if [ $CHKPS -gt 0 ]; then
 #	labelok; echo " Command sent, secthemall-status client is running."
@@ -25,7 +25,7 @@ sleep 10 && /usr/bin/python /root/cwaf-client/client/send_stub_status.py > /dev/
 
 # start updates
 labelin; echo " Starting secthemall-updates client..."
-sleep 10 && /usr/bin/python /root/cwaf-client/client/updates.py > /dev/null 2>&1 &
+sleep 10 && /usr/bin/python /root/cwaf-client/client/updates.py &
 #CHKPS=$(ps aux | grep 'updates' | grep -v grep | wc -l)
 #if [ $CHKPS -gt 0 ]; then
 #	labelok; echo " Command sent, secthemall-updates client is running."
