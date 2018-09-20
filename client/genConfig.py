@@ -8,6 +8,12 @@ cfile = cpath+'/configurations.json'
 c = json.load(open(cfile, 'r'))
 
 for cname, carr in c['conf'].items():
+
+	if 'proxyPassOverride' in carr and carr['proxyPassOverride'] != '':
+		proxypasstarget = carr['proxyPassOverride'];
+	else:
+		proxypasstarget = carr['fwd_proto']+"://"+cname+"-backend";
+
         if carr['listen'].has_key('http'):
                 if carr.has_key('fwd_uri'):
                         configout = "upstream "+cname+"-backend {\n"
@@ -47,6 +53,7 @@ for cname, carr in c['conf'].items():
 		configout += "\tunderscores_in_headers on;\n\n"
 
                 if carr.has_key('proxy_conf') is False:
+                        configout += "\tproxy_buffering off;\n"
                         configout += "\tproxy_buffer_size 5120;\n"
                         configout += "\tproxy_redirect off;\n"
                         configout += "\t#proxy_ssl_server_name on;\n"
@@ -135,7 +142,7 @@ for cname, carr in c['conf'].items():
                                         configout += u"\t\tset $ngo_domain \""+servernames.strip()+"\";\n"
                                         configout += u"\t\tset $ngo_whitelist \""+gouser.strip()+"\";\n"
                                         configout += u"\t\taccess_by_lua_file \"/usr/local/openresty/nginx/google-oauth/access.lua\";\n"
-                                        configout += u"\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                                        configout += u"\t\tproxy_pass "+proxypasstarget+";\n"
                                         configout += u"\t}\n\n"
 
 
@@ -178,7 +185,7 @@ for cname, carr in c['conf'].items():
 
                 if ($allowreq = 1) {
 '''
-                                        configout += u"\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                                        configout += u"\t\tproxy_pass "+proxypasstarget+";\n"
                                         configout += '''
                 }
                                         '''
@@ -199,7 +206,7 @@ for cname, carr in c['conf'].items():
 
                 configout += "\tlocation ~* /.*\.(ico|jpg|png|bmp|tiff|gif|svg|css|js|woff|woff2|eot|zip|7z|iso|pdf|doc|docx|xls|ppt|pptx)$ {\n"
                 configout += "\t\tmodsecurity off;\n"
-                configout += "\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                configout += "\t\tproxy_pass "+proxypasstarget+";\n"
                 configout += "\t}\n\n"
 
                 # Proxy Pass
@@ -208,7 +215,7 @@ for cname, carr in c['conf'].items():
                 configout += "\t\tmodsecurity on;\n";
                 configout += "\t\tmodsecurity_rules_file /usr/local/openresty/nginx/conf/modsecurity_config/"+cname+"/"+cname+";\n";
                 configout += "\n";
-                configout += "\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                configout += "\t\tproxy_pass "+proxypasstarget+";\n"
                 configout += "\t}\n"
 
                 configout += "\n"
@@ -231,12 +238,29 @@ for cname, carr in c['conf'].items():
 
                 configout += "server {\n"
 
+		if 'httptohttps' in carr:
+			if carr['httptohttps'] == 1:
+				configout += "\tlisten 80;\n"
+				configout += "\tif ($scheme = http) {\n"
+				configout += "\t\treturn 301 https://$server_name$request_uri;\n"
+				configout += "\t}\n"
+
                 configout += "\tlisten "+carr['listen']['https']+" ssl;\n\n"
 
                 configout += "\tssl on;\n"
-                configout += "\tssl_protocols TLSv1.1 TLSv1.2;\n"
+
+		if 'sslProtocols' in carr and carr['sslProtocols'] != '':
+			configout += "\tssl_protocols "+carr['sslProtocols']+";\n"
+		else:
+                	configout += "\tssl_protocols TLSv1.1 TLSv1.2;\n"
+
                 configout += "\tssl_prefer_server_ciphers on;\n"
-                configout += "\tssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';\n"
+
+		if 'sslCiphers' in carr and carr['sslCiphers'] != '':
+                	configout += "\tssl_ciphers '"+carr['sslCiphers']+"';\n"
+		else:
+                	configout += "\tssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';\n"
+
                 configout += "\tssl_dhparam /root/ssl/dhparam.pem;\n"
 
 		if carr.has_key('sslOverrideCrt') and carr.has_key('sslOverrideKey'):
@@ -276,8 +300,16 @@ for cname, carr in c['conf'].items():
 
 		configout += "\tunderscores_in_headers on;\n\n"
 
+		if 'sslProxyProtocols' in carr and carr['sslProxyProtocols'] != '':
+			configout += "\tproxy_ssl_protocols "+carr['sslProxyProtocols']+";\n"
+		else:
+                	configout += "\tproxy_ssl_protocols TLSv1.1 TLSv1.2;\n"
+
+		if 'sslProxyCiphers' in carr and carr['sslProxyCiphers'] != '':
+			configout += "\tproxy_ssl_ciphers '"+carr['sslProxyCiphers']+"';\n";
+
                 if carr.has_key('proxy_conf') is False:
-                        configout += "\tproxy_cache_bypass 1;\n"
+                        configout += "\tproxy_buffering off;\n"
                         configout += "\tproxy_buffer_size 5120;\n"
                         configout += "\tproxy_redirect off;\n"
                         configout += "\tproxy_ssl_server_name on;\n"
@@ -365,7 +397,7 @@ for cname, carr in c['conf'].items():
                                         configout += u"\t\tset $ngo_domain \""+servernames.strip()+"\";\n"
                                         configout += u"\t\tset $ngo_whitelist \""+gouser.strip()+"\";\n"
                                         configout += u"\t\taccess_by_lua_file \"/usr/local/openresty/nginx/google-oauth/access.lua\";\n"
-                                        configout += u"\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                                        configout += u"\t\tproxy_pass "+proxypasstarget+";\n"
                                         configout += u"\t}\n\n"
 
 
@@ -407,7 +439,7 @@ for cname, carr in c['conf'].items():
 
                 if ($allowreq = 1) {
 '''
-                                        configout += u"\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                                        configout += u"\t\tproxy_pass "+proxypasstarget+";\n"
                                         configout += '''
                 }
                                         '''
@@ -429,7 +461,7 @@ for cname, carr in c['conf'].items():
 
                 configout += "\tlocation ~* /.*\.(ico|jpg|png|bmp|tiff|gif|svg|css|js|woff|woff2|eot|zip|7z|iso|pdf|doc|docx|xls|ppt|pptx)$ {\n"
                 configout += "\t\tmodsecurity off;\n"
-                configout += "\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                configout += "\t\tproxy_pass "+proxypasstarget+";\n"
                 configout += "\t}\n\n"
 
                 # Proxy Pass
@@ -438,7 +470,7 @@ for cname, carr in c['conf'].items():
                 configout += "\t\tmodsecurity on;\n";
                 configout += "\t\tmodsecurity_rules_file /usr/local/openresty/nginx/conf/modsecurity_config/"+cname+"/"+cname+";\n";
                 configout += "\n";
-                configout += "\t\tproxy_pass "+carr['fwd_proto']+"://"+cname+"-backend;\n"
+                configout += "\t\tproxy_pass "+proxypasstarget+";\n"
                 configout += "\t}\n"
 
                 configout += "\n"
