@@ -69,76 +69,76 @@ def startUpdate():
 
 		
 
-	# get blacklist updates
-	# ----------------------
-	sta.log('INFO', 'Looking for blacklist updates...')
+	## get blacklist updates
+	## ----------------------
+	#sta.log('INFO', 'Looking for blacklist updates...')
 	downloadbl = False
-	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getblacklist', 'lastid':'1', 'hostname':hostname})
-	res = json.loads(r.text)
+	#r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getblacklist', 'lastid':'1', 'hostname':hostname})
+	#res = json.loads(r.text)
 	# print '--- bl md5: '+res['lastid']
 
-	if os.path.isfile(lastidbl):
-		if open(lastidbl).read().strip() != str(res['lastid']):
-			downloadbl = True
-		else:
-			downloadbl = False
-	else:
-		downloadbl = True
+	#if os.path.isfile(lastidbl):
+	#	if open(lastidbl).read().strip() != str(res['lastid']):
+	#		downloadbl = True
+	#	else:
+	#		downloadbl = False
+	#else:
+	#	downloadbl = True
 
 
-	if downloadbl:
-		sta.log('OK', 'Downloading blacklist updates: '+str(res['lastid']))
+	#if downloadbl:
+	#	sta.log('OK', 'Downloading blacklist updates: '+str(res['lastid']))
 
-		# write lastid
-		f = open(lastidbl, 'w')
-		f.write(str(res['lastid']))
-		f.close()
+	#	# write lastid
+	#	f = open(lastidbl, 'w')
+	#	f.write(str(res['lastid']))
+	#	f.close()
 
-		# write ip list
-		r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getblacklist', 'hostname':hostname})
-		res = json.loads(r.text)
-		f = open(blfile, 'w')
-		f.write('\n'.join(res).strip())
-		f.close()
+	#	# write ip list
+	#	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getblacklist', 'hostname':hostname})
+	#	res = json.loads(r.text)
+	#	f = open(blfile, 'w')
+	#	f.write('\n'.join(res).strip())
+	#	f.close()
 
-		# reload nginx
-		#sta.nginx('reload')
+	#	# reload nginx
+	#	#sta.nginx('reload')
 
 
 
 
 	# get tor exit nodes updates
 	# --------------------------
-	sta.log('INFO', 'Looking for Tor Exit Nodes updates...')
+	#sta.log('INFO', 'Looking for Tor Exit Nodes updates...')
 	downloadtor = False
-	r = requests.get('https://secthemall.com/public-list/tor-exit-nodes/json/', {'lastid':'true'})
-	res = json.loads(r.text)
+	#r = requests.get('https://secthemall.com/public-list/tor-exit-nodes/json/', {'lastid':'true'})
+	#res = json.loads(r.text)
 
-	if os.path.isfile(lastidtor):
-		if open(lastidtor).read().strip() != str(res['lastid']):
-			downloadtor = True
-		else:
-			downloadtor = False
-	else:
-		downloadtor = True
+	#if os.path.isfile(lastidtor):
+	#	if open(lastidtor).read().strip() != str(res['lastid']):
+	#		downloadtor = True
+	#	else:
+	#		downloadtor = False
+	#else:
+	#	downloadtor = True
 
 
-	if downloadtor:
-		sta.log('OK', 'Downloading Tor Exit Nodes updates: '+str(res['lastid']))
+	#if downloadtor:
+	#	sta.log('OK', 'Downloading Tor Exit Nodes updates: '+str(res['lastid']))
 
-		# write lastid
-		f = open(lastidtor, 'w')
-		f.write(str(res['lastid']))
-		f.close()
+	#	# write lastid
+	#	f = open(lastidtor, 'w')
+	#	f.write(str(res['lastid']))
+	#	f.close()
 
-		# write ip list
-		r = requests.post('https://secthemall.com/public-list/tor-exit-nodes/iplist/', {'size':10000}, auth=HTTPBasicAuth(c['username'], c['apikey']))
-		f = open(torfile, 'w')
-		f.write(r.text.strip())
-		f.close()
+	#	# write ip list
+	#	r = requests.post('https://secthemall.com/public-list/tor-exit-nodes/iplist/', {'size':10000}, auth=HTTPBasicAuth(c['username'], c['apikey']))
+	#	f = open(torfile, 'w')
+	#	f.write(r.text.strip())
+	#	f.close()
 
-		# reload nginx
-		#sta.nginx('reload')
+	#	# reload nginx
+	#	#sta.nginx('reload')
 
 
 
