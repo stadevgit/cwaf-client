@@ -204,10 +204,10 @@ for cname, carr in c['conf'].items():
                 configout += "\t\trewrite ^/staReplaceContents/(.*)$ /ReplaceContents/$1 break;\n"
                 configout += "\t}\n\n"
 
-                configout += "\tlocation ~* /.*\.(ico|jpg|png|bmp|tiff|gif|svg|css|js|woff|woff2|eot|zip|7z|iso|pdf|doc|docx|xls|ppt|pptx)$ {\n"
-                configout += "\t\tmodsecurity off;\n"
-                configout += "\t\tproxy_pass "+proxypasstarget+";\n"
-                configout += "\t}\n\n"
+                #configout += "\tlocation ~* /.*\.(ico|jpg|png|bmp|tiff|gif|svg|css|js|woff|woff2|eot|zip|7z|iso|pdf|doc|docx|xls|ppt|pptx|mp4)$ {\n"
+                #configout += "\t\tmodsecurity off;\n"
+                #configout += "\t\tproxy_pass "+proxypasstarget+";\n"
+                #configout += "\t}\n\n"
 
                 # Proxy Pass
                 configout += "\tlocation ~* /.* {\n"
@@ -459,10 +459,10 @@ for cname, carr in c['conf'].items():
                 configout += "\t\trewrite ^/staReplaceContents/(.*)$ /ReplaceContents/$1 break;\n"
                 configout += "\t}\n\n"
 
-                configout += "\tlocation ~* /.*\.(ico|jpg|png|bmp|tiff|gif|svg|css|js|woff|woff2|eot|zip|7z|iso|pdf|doc|docx|xls|ppt|pptx)$ {\n"
-                configout += "\t\tmodsecurity off;\n"
-                configout += "\t\tproxy_pass "+proxypasstarget+";\n"
-                configout += "\t}\n\n"
+                #configout += "\tlocation ~* /.*\.(ico|jpg|png|bmp|tiff|gif|svg|css|js|woff|woff2|eot|zip|7z|iso|pdf|doc|docx|xls|ppt|pptx|mp4)$ {\n"
+                #configout += "\t\tmodsecurity off;\n"
+                #configout += "\t\tproxy_pass "+proxypasstarget+";\n"
+                #configout += "\t}\n\n"
 
                 # Proxy Pass
                 configout += "\tlocation ~* /.* {\n"
