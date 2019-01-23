@@ -23,7 +23,7 @@ def startUpdate():
 	# load json config file
 	c = json.load(open('/root/cwaf-client/client/config.json'))
 
-	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getupdates', 'hostname':hostname.rstrip()})
+	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getupdates', 'hostname':hostname.rstrip()}, timeout=10)
 	res = json.loads(r.text)
 	# finire getupdates (serve per reload conf nginx)
 	if res.has_key('ok'):
@@ -37,7 +37,7 @@ def startUpdate():
 
 	sta.log('INFO', 'Looking for configuration updates...')
 	downloadconf = False
-	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'],'apikey':c['apikey'],'a':'configupdates','hostname':hostname})
+	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'],'apikey':c['apikey'],'a':'configupdates','hostname':hostname}, timeout=10)
 	cupdate = json.loads(r.text)
 
 	if cupdate.has_key('lastid'):
@@ -170,7 +170,7 @@ else:
 	if re.search('^\S+\@[a-zA-Z0-9\-\_\.]+$', sys.argv[1]) is not None and re.search('^[a-z0-9]+$', sys.argv[2]) is not None:
 		email = sys.argv[1]
 		apikey = sys.argv[2]
-		r = requests.post('https://secthemall.com/api/waf', data={"username":email, "apikey":apikey, "a":"getpassphrase"})
+		r = requests.post('https://secthemall.com/api/waf', data={"username":email, "apikey":apikey, "a":"getpassphrase"}, timeout=10)
 		res = json.loads(r.text)
 
 		if res['ok'] is not None:
@@ -185,7 +185,7 @@ else:
 				json.dump(config, f)
 
 			sta.log('OK', "Creating / Checking node "+hostname+"...")
-			r = requests.post('https://secthemall.com/api/waf', data={"username":email, "apikey":apikey, "a":"new", "hostname":hostname})
+			r = requests.post('https://secthemall.com/api/waf', data={"username":email, "apikey":apikey, "a":"new", "hostname":hostname}, timeout=10)
 			# print r.text
 
 			resjson = json.loads(r.text)
