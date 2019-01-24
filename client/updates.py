@@ -62,6 +62,7 @@ def startUpdate():
 		f.close()
 
 		os.system('python '+cpath+'/genConfig.py')
+		os.system('python '+cpath+'/cleanup.py')
 		#sta.nginx('reload')
 	else:
 		sta.log('INFO', 'No configuration updates')

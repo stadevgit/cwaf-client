@@ -7,11 +7,18 @@ cpath = os.path.dirname(os.path.abspath(__file__))
 cfile = cpath+'/configurations.json'
 c = json.load(open(cfile, 'r'))
 
-for filename in os.listdir('/usr/local/openresty/nginx/conf/waf/'):
-	if filename in c['conf']:
-		print(filename)
-	else:
+nginxpath = '/usr/local/openresty/nginx/conf'
+
+for filename in os.listdir(nginxpath+'/waf/'):
+	if filename not in c['conf']:
 		print("REMOVE: "+filename)
 
-#for cname, carr in c['conf'].items():
-#	print cname
+		for modseconf in os.listdir(nginxpath+'/modsecurity_config/'+filename):
+			#print(" -> rm "+nginxpath+"/modsecurity_config/"+filename+"/"+modseconf)
+			os.remove(nginxpath+"/modsecurity_config/"+filename+"/"+modseconf)
+
+		#print("- rmdir "+nginxpath+"/modsecurity_config/"+filename)
+		os.rmdir(nginxpath+"/modsecurity_config/"+filename)
+		#print("- rm "+nginxpath+"/waf/"+filename)
+		os.remove(nginxpath+"/waf/"+filename)
+
