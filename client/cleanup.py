@@ -7,10 +7,11 @@ cpath = os.path.dirname(os.path.abspath(__file__))
 cfile = cpath+'/configurations.json'
 c = json.load(open(cfile, 'r'))
 
-nginxpath = '/usr/local/openresty/nginx/conf'
+#nginxpath = '/usr/local/openresty/nginx/conf'
+nginxpath = '/root/git/resty-crs/conf'
 
 for filename in os.listdir(nginxpath+'/waf/'):
-	if filename not in c['conf']:
+	if filename not in c['conf'] and filename != ".gitkeep":
 		print("REMOVE: "+filename)
 
 		for modseconf in os.listdir(nginxpath+'/modsecurity_config/'+filename):

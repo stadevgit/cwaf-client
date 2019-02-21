@@ -8,20 +8,21 @@ hostname = os.popen('hostname').read().rstrip()
 cpath = os.path.dirname(os.path.abspath(__file__))
 
 nginxpath = '/usr/local/openresty/nginx'
+logspath = '/root/git/resty-crs/logs'
 cfile = cpath+'/configurations.json'
 lastidfile = cpath+'/ids/lastid_config'
 lastidbl = cpath+'/ids/lastid_bl'
 lastidtor = cpath+'/ids/lastid_tor'
-blfile = nginxpath+'/conf/bl/modsecurity_bad_reputation.txt'
-torfile = nginxpath+'/conf/bl/modsecurity_tor_exit_nodes.txt'
+#blfile = nginxpath+'/conf/bl/modsecurity_bad_reputation.txt'
+#torfile = nginxpath+'/conf/bl/modsecurity_tor_exit_nodes.txt'
 
 
 def startUpdate():
 	# remove all empty log dirs
-	os.popen('find /usr/local/openresty/nginx/logs/modsecurity/http*/* -type d -empty -exec rm -rvf {} \; 2>/dev/null')
+	os.popen('find '+logspath+'/http*/* -type d -empty -exec rm -rvf {} \; 2>/dev/null')
 
 	# load json config file
-	c = json.load(open('/root/cwaf-client/client/config.json'))
+	c = json.load(open(cpath+'/config.json'))
 
 	r = requests.post('https://secthemall.com/api/waf', {'username':c['username'], 'apikey':c['apikey'], 'a':'getupdates', 'hostname':hostname.rstrip()}, timeout=10)
 	res = json.loads(r.text)
@@ -182,7 +183,7 @@ else:
 				"usertz":res['usertz']
 			}
 
-			with open('/root/cwaf-client/client/config.json', 'w') as f:
+			with open(cpath+'/config.json', 'w') as f:
 				json.dump(config, f)
 
 			sta.log('OK', "Creating / Checking node "+hostname+"...")

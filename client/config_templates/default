@@ -59,7 +59,7 @@ SecAuditLogStorageDir /usr/local/openresty/nginx/logs/modsecurity/%{REPLACE:CONF
 
 SecArgumentSeparator &
 SecCookieFormat 0
-SecUnicodeMapFile unicode.mapping 20127
+SecUnicodeMapFile /usr/local/openresty/nginx/conf/unicode.mapping 20127
 SecStatusEngine Off
 
 
@@ -68,24 +68,53 @@ SecStatusEngine Off
 
 
 # setup
-Include /usr/local/openresty/nginx/conf/owasp-modsecurity-crs/crs-setup.conf
+Include /opt/owasp-modsecurity-crs/crs-setup.conf
 
 # override
 Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.override
 Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.override.by.user
 
 # bad reputation
-SecRule REMOTE_ADDR "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:1,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
-SecRule REMOTE_ADDR "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_tor_exit_nodes.txt" "id:2,msg:'TOR exit node',tag:'bad-reputation/TOR-exit-node',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+#SecRule REMOTE_ADDR "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:1,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+#SecRule REMOTE_ADDR "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_tor_exit_nodes.txt" "id:2,msg:'TOR exit node',tag:'bad-reputation/TOR-exit-node',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
 
 # bad reputation cloudflare
-SecRule REQUEST_HEADERS:CF-Connecting-IP "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:3,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+#SecRule REQUEST_HEADERS:CF-Connecting-IP "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:3,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
 
 # bad reputation x-forwarded-for
-SecRule REQUEST_HEADERS:X-Forwarded-For "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:4,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
+#SecRule REQUEST_HEADERS:X-Forwarded-For "@ipMatchFromFile /usr/local/openresty/nginx/conf/bl/modsecurity_bad_reputation.txt" "id:4,msg:'Bad Reputation',tag:'bad-reputation/global',severity:'CRITICAL',phase:request,log,ver:'SECTHEMALL_Bad_Reputation',maturity:'9',accuracy:'9',rev:'1',capture,drop"
 
 # owasp core ruleset
-Include /usr/local/openresty/nginx/conf/owasp-modsecurity-crs/rules/*.conf
+#Include /usr/local/openresty/nginx/conf/owasp-modsecurity-crs/rules/*.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-901-INITIALIZATION.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-903.9003-NEXTCLOUD-EXCLUSION-RULES.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-903.9004-DOKUWIKI-EXCLUSION-RULES.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-903.9005-CPANEL-EXCLUSION-RULES.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-905-COMMON-EXCEPTIONS.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-910-IP-REPUTATION.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-911-METHOD-ENFORCEMENT.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-912-DOS-PROTECTION.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-913-SCANNER-DETECTION.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-921-PROTOCOL-ATTACK.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-931-APPLICATION-ATTACK-RFI.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-932-APPLICATION-ATTACK-RCE.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-944-APPLICATION-ATTACK-JAVA.conf
+Include /opt/owasp-modsecurity-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf
+#Include /opt/owasp-modsecurity-crs/rules/RESPONSE-950-DATA-LEAKAGES.conf
+#Include /opt/owasp-modsecurity-crs/rules/RESPONSE-951-DATA-LEAKAGES-SQL.conf
+#Include /opt/owasp-modsecurity-crs/rules/RESPONSE-952-DATA-LEAKAGES-JAVA.conf
+#Include /opt/owasp-modsecurity-crs/rules/RESPONSE-953-DATA-LEAKAGES-PHP.conf
+#Include /opt/owasp-modsecurity-crs/rules/RESPONSE-954-DATA-LEAKAGES-IIS.conf
+Include /opt/owasp-modsecurity-crs/rules/RESPONSE-959-BLOCKING-EVALUATION.conf
+Include /opt/owasp-modsecurity-crs/rules/RESPONSE-980-CORRELATION.conf
 
 # stawaf custom rules
 Include /usr/local/openresty/nginx/conf/modsecurity_config/%{REPLACE:CONFNAME}/%{REPLACE:CONFNAME}.custom.*

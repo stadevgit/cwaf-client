@@ -1,3 +1,4 @@
 client/ids/*
+!client/ids/.gitkeep
 client/*.json
 *.pyc

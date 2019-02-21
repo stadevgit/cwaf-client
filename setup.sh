@@ -1,12 +1,15 @@
 #!/bin/bash
 
-source /root/cwaf-client/inc/bash_colors.sh
+MY_PATH="`dirname \"$0\"`"              # relative
+MY_PATH="`( cd \"$MY_PATH\" && pwd )`"  # absolutized and normalized
+
+source $MY_PATH/inc/bash_colors.sh
 
 echo "+"
 echo -n "+ (::) "; clr_blackb "SEC" -n; clr_blueb "THEM" -n; clr_blackb "ALL"
 echo "+"
 
-if [ -f /root/cwaf-client/client/config.json ]; then
+if [ -f $MY_PATH/client/config.json ]; then
 	labelwa; echo -n " Configuration already exists. Do you want to overwrite it? [y/N]: "
 	read ans
 
@@ -22,9 +25,9 @@ if [ -f /root/cwaf-client/client/config.json ]; then
 		fi
 	fi
 else
-	touch /root/cwaf-client/client/config.json
-	mkdir /root/cwaf-client/client/ids
-	touch /root/cwaf-client/client/ids/lastid_config
+	touch $MY_PATH/client/config.json
+	mkdir $MY_PATH/client/ids
+	touch $MY_PATH/client/ids/lastid_config
 fi
 
 dpkg-reconfigure tzdata 2>/dev/null
@@ -51,7 +54,7 @@ if [[ "${USERID:0:2}" == "ok" ]]; then
 	APIKEY=${USERID:74}
 
 	echo ""
-	python /root/cwaf-client/client/updates.py "${USERNAME}" "${APIKEY}"
+	python $MY_PATH/client/updates.py "${USERNAME}" "${APIKEY}"
 
 	labelok; echo " Done."
 	labelok; echo " Now you can start this container."

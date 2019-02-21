@@ -1,17 +1,28 @@
 #!/usr/bin/env python
 
-import os, json, time, requests, re, urllib, netaddr
+import os, json, time, requests, re, urllib
 
 hostname = os.popen('hostname').read().strip()
 
+cpath = os.path.dirname(os.path.abspath(__file__))
+
+nginxpath = '/usr/local/openresty/nginx'
+logspath = '/root/git/resty-crs/logs'
+cfile = cpath+'/configurations.json'
+lastidfile = cpath+'/ids/lastid_config'
+lastidbl = cpath+'/ids/lastid_bl'
+lastidtor = cpath+'/ids/lastid_tor'
+#blfile = nginxpath+'/conf/bl/modsecurity_bad_reputation.txt'
+#torfile = nginxpath+'/conf/bl/modsecurity_tor_exit_nodes.txt'
+
 try:
-	with open('/root/cwaf-client/client/config.json') as data_file:    
+	with open(cpath+'/../config.json') as data_file:    
 		config = json.load(data_file)
 except:
 	print "+ Config file not found, creating it..."
 	config = {}
 else:
-	with open('/root/cwaf-client/client/config.json') as data_file:    
+	with open(cpath+'/../config.json') as data_file:    
 		config = json.load(data_file)
 
 class bcolor:
@@ -49,17 +60,17 @@ def encrypt(string):
 def nginx(ctl):
 	global config, hostname
 	if ctl == 'reload':
-		pidn = int(os.popen('ps aux | grep nginx | grep -v grep | wc -l').read().strip())
-		if pidn <= 0:
-			log('OK', 'starting Nginx web server')
-			os.popen('/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf 2>&1')
-		else:
-			log('OK', 'reloading Nginx configuration files')
-			os.popen('/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf -s reload 2>&1')
+		#pidn = int(os.popen('ps aux | grep nginx | grep -v grep | wc -l').read().strip())
+		#if pidn <= 0:
+		#	log('OK', 'starting Nginx web server')
+		#	os.popen('/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf 2>&1')
+		#else:
+		log('OK', 'reloading Nginx configuration files')
+		os.popen('docker exec -ti resty-crs /usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf -s reload 2>&1')
 
 	if ctl == 'check':
 		senderror = False
-		configtest = os.popen('/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf -t 2>&1').read().strip()
+		configtest = os.popen('docker exec -ti resty-crs /usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf -t 2>&1').read().strip()
 		if re.search('(failed|invalid|error)', configtest) is not None:
 			senderror = True
 
@@ -84,21 +95,21 @@ def nginx(ctl):
 
 		return senderror
 
-def getip(mslog):
+#def getip(mslog):
 	# print mslog['transaction']['request']['headers']
 
-	if netaddr.IPAddress(mslog['transaction']['client_ip']).version == 4:
-		ipv = 'ipv4'
-	elif netaddr.IPAddress(mslog['transaction']['client_ip']).version == 6:
-		ipv = 'ipv6'
-	else:
-		return '127.0.0.1'
-
-
-	realip = mslog['transaction']['client_ip']
-	with open('/root/cwaf-client/client/inc/cf-'+ipv+'.txt', 'r') as fp:
-		for cfcidr in fp:
-			if netaddr.IPAddress(realip) in netaddr.IPNetwork(cfcidr.strip()):
-				realip = mslog['transaction']['request']['headers']['cf-connecting-ip']
-
-	return realip
+#	if netaddr.IPAddress(mslog['transaction']['client_ip']).version == 4:
+#		ipv = 'ipv4'
+#	elif netaddr.IPAddress(mslog['transaction']['client_ip']).version == 6:
+#		ipv = 'ipv6'
+#	else:
+#		return '127.0.0.1'
+#
+#
+#	realip = mslog['transaction']['client_ip']
+#	with open('/root/cwaf-client/client/inc/cf-'+ipv+'.txt', 'r') as fp:
+#		for cfcidr in fp:
+#			if netaddr.IPAddress(realip) in netaddr.IPNetwork(cfcidr.strip()):
+#				realip = mslog['transaction']['request']['headers']['cf-connecting-ip']
+#
+#	return realip

@@ -1,11 +1,18 @@
 import sys, os, json, re, base64, time, shutil, pwd, grp
 from HTMLParser import HTMLParser
 
+wafconfpath = '/root/git/resty-crs/conf/waf/'
+modseccpath = '/root/git/resty-crs/conf/modsecurity_config/'
+waflogspath = '/root/git/resty-crs/logs/'
+
 html = HTMLParser()
 
 cpath = os.path.dirname(os.path.abspath(__file__))
 cfile = cpath+'/configurations.json'
 c = json.load(open(cfile, 'r'))
+
+if 'conf' in c and type(c['conf']) is list:
+	exit(0)
 
 for cname, carr in c['conf'].items():
 
@@ -226,7 +233,7 @@ for cname, carr in c['conf'].items():
                 # end
                 configout += "}"
 
-                fc = open('/usr/local/openresty/nginx/conf/waf/'+cname, 'w')
+                fc = open(wafconfpath+cname, 'w')
                 fc.write(configout)
                 fc.close()
         else:
@@ -261,7 +268,7 @@ for cname, carr in c['conf'].items():
 		else:
                 	configout += "\tssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';\n"
 
-                configout += "\tssl_dhparam /root/ssl/dhparam.pem;\n"
+                configout += "\tssl_dhparam /usr/local/openresty/nginx/ssl/dhparam.pem;\n"
 
 		if carr.has_key('sslOverrideCrt') and carr.has_key('sslOverrideKey'):
 			configout += "\tssl_certificate "+carr['sslOverrideCrt']+"; # override\n"
@@ -481,16 +488,16 @@ for cname, carr in c['conf'].items():
                 # end
                 configout += "}"
 
-                fc = open('/usr/local/openresty/nginx/conf/waf/'+cname, 'w')
+                fc = open(wafconfpath+cname, 'w')
                 fc.write(configout)
                 fc.close()
 
 
-        if os.path.isdir('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname) is False:
-                os.mkdir('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname)
+        if os.path.isdir(modseccpath+cname) is False:
+                os.mkdir(modseccpath+cname)
 
         modsecconf = open(cpath+'/config_templates/default', 'r').read().replace('%{REPLACE:CONFNAME}', cname)
-        fc = open('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname, 'w')
+        fc = open(modseccpath+cname+'/'+cname, 'w')
         fc.write(modsecconf)
         fc.close()
 
@@ -501,28 +508,28 @@ for cname, carr in c['conf'].items():
         else:
 		modsecconf = modsecconf+'\n\nSecAction "id:900000,phase:1,nolog,pass,t:none,setvar:tx.paranoia_level=1"'
 
-        fc = open('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname+'.override', 'w')
+        fc = open(modseccpath+cname+'/'+cname+'.override', 'w')
         fc.write(modsecconf)
         fc.close()
 
         modsecconf = open(cpath+'/config_templates/default.custom.6000', 'r').read().replace('%{REPLACE:FileExt}', carr['modsec']['FileExt'].replace(' ', '|'))
-        fc = open('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname+'.custom.6000', 'w')
+        fc = open(modseccpath+cname+'/'+cname+'.custom.6000', 'w')
         fc.write(modsecconf)
         fc.close()
 
-        shutil.copy(cpath+'/config_templates/default.custom.6001', '/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname+'.custom.6001')
-        shutil.copy(cpath+'/config_templates/default.ignore', '/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname+'.ignore')
+        shutil.copy(cpath+'/config_templates/default.custom.6001', modseccpath+cname+'/'+cname+'.custom.6001')
+        shutil.copy(cpath+'/config_templates/default.ignore', modseccpath+cname+'/'+cname+'.ignore')
 
         if carr['modsec'].has_key('override_by_user'):
-                fc = open('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname+'.override.by.user', 'w')
+                fc = open(modseccpath+cname+'/'+cname+'.override.by.user', 'w')
                 fc.write("# generated at "+str(time.time())+"\n\n"+html.unescape(base64.decodestring(carr['modsec']['override_by_user'])))
                 fc.close()
         else:
-                fc = open('/usr/local/openresty/nginx/conf/modsecurity_config/'+cname+'/'+cname+'.override.by.user')
+                fc = open(modseccpath+cname+'/'+cname+'.override.by.user')
                 fc.write("# generated at "+str(time.time())+"\n\n")
                 fc.close()
 
 
-        if os.path.isdir('/usr/local/openresty/nginx/logs/modsecurity/'+cname) is False:
-                os.mkdir('/usr/local/openresty/nginx/logs/modsecurity/'+cname)
-                os.chown('/usr/local/openresty/nginx/logs/modsecurity/'+cname, pwd.getpwnam("nobody").pw_uid, grp.getgrnam("nogroup").gr_gid)
+        if os.path.isdir(waflogspath+cname) is False:
+                os.mkdir(waflogspath+cname)
+                os.chown(waflogspath+cname, pwd.getpwnam("nobody").pw_uid, grp.getgrnam("nogroup").gr_gid)
