@@ -19,7 +19,7 @@ try:
 	with open(cpath+'/../config.json') as data_file:    
 		config = json.load(data_file)
 except:
-	print "+ Config file not found, creating it..."
+	print("+ Config file not found, creating it...")
 	config = {}
 else:
 	with open(cpath+'/../config.json') as data_file:    

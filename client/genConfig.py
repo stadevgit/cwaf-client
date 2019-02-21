@@ -45,14 +45,14 @@ for cname, carr in c['conf'].items():
                         if 'respbody' in carr and 'email' in carr['respbody'] and carr['respbody']['email'] == 1:
                                 bodyfiltersflags += 'M'
                 except:
-                        print 'no respbody'
+                        print('no respbody')
 
 
                 try:
                         if 'respbody' in carr and 'error' in carr['respbody'] and carr['respbody']['error'] == 1:
                                 bodyfiltersflags += 'E'
                 except:
-                        print 'no respbody'
+                        print('no respbody')
 
 
                 configout += "\tset $tmwBodyFunc \""+bodyfiltersflags+"\";\n\n"
@@ -293,14 +293,14 @@ for cname, carr in c['conf'].items():
                         if 'respbody' in carr and 'email' in carr['respbody'] and carr['respbody']['email'] == 1:
                                 bodyfiltersflags += 'M'
                 except:
-                        print 'no respbody'
+                        print('no respbody')
 
 
                 try:
                         if 'respbody' in carr and 'error' in carr['respbody'] and carr['respbody']['error'] == 1:
                                 bodyfiltersflags += 'E'
                 except:
-                        print 'no respbody'
+                        print('no respbody')
 
 
                 configout += "\tset $tmwBodyFunc \""+bodyfiltersflags+"\";\n\n"
