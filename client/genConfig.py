@@ -26,6 +26,7 @@ for cname, carr in c['conf'].items():
                         configout = "upstream "+cname+"-backend {\n"
                         for fw in carr['fwd_uri']:
                                 configout += "\tserver "+fw+";\n"
+                                configout += "\tkeepalive 16;\n"
                         configout += "}\n\n"
 
                 configout += "server {\n"
@@ -241,6 +242,7 @@ for cname, carr in c['conf'].items():
                         configout = "upstream "+cname+"-backend {\n"
                         for fw in carr['fwd_uri']:
                                 configout += "\tserver "+fw+";\n"
+                                configout += "\tkeepalive 16;\n"
                         configout += "}\n\n"
 
                 configout += "server {\n"
